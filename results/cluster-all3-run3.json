@@ -1,0 +1,27 @@
+{
+  "label": "all3-run3",
+  "docs": 2000000,
+  "tokens_per_doc": 512,
+  "chunks": 100,
+  "seconds": 7.533,
+  "tokens_per_sec": 135935748,
+  "nodes": [
+    {
+      "name": "데스크톱",
+      "cores": 8,
+      "chunks": 16
+    },
+    {
+      "name": "노트북",
+      "cores": 20,
+      "chunks": 48
+    },
+    {
+      "name": "S26U",
+      "cores": 8,
+      "chunks": 36
+    }
+  ],
+  "mean_score": 0.49999712112860883,
+  "at": "2026-10-09 14:19:18"
+}

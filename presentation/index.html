@@ -163,7 +163,7 @@
       <div class="nodes">
         <div class="box"><b>폰 SpareNode 앱</b>8코어 워커가 자동 실행</div>
         <div class="box"><b>노트북 브라우저</b>20코어</div>
-        <div class="box" style="border-style:dashed"><b>데스크톱 · 공기계</b>같은 앱으로 참여 (예정)</div>
+        <div class="box"><b>데스크톱 (원격)</b>Tailscale로 접속, 8스레드</div>
       </div>
     </div>
     <div class="cols-3" style="margin-top:34px">
@@ -248,31 +248,34 @@ out = run_job(code, inputs)
 
   <!-- 7. 벤치마크 -->
   <section class="slide">
-    <p class="kicker">결과 ① 기기 단독 성능 (1분 측정, 같은 시각)</p>
-    <h2>S26 Ultra 8코어가 노트북 20코어보다 빨랐다</h2>
+    <p class="kicker">결과 ① 기기 단독 성능 (1분 측정)</p>
+    <h2>S26 Ultra 8코어가 노트북·데스크톱보다 빨랐다</h2>
     <div class="cols">
       <div>
         <p class="small" style="margin:0 0 14px">B1 SynthID 점수 계산 · 백만 token/s</p>
         <div class="bars">
           <div class="bar-row"><span>S26 Ultra</span><div class="bar-track"><div class="bar acc" style="width:100%"></div></div><span class="v">121.6</span></div>
           <div class="bar-row"><span>노트북</span><div class="bar-track"><div class="bar" style="width:58.5%"></div></div><span class="v">71.1</span></div>
+          <div class="bar-row"><span>데스크톱</span><div class="bar-track"><div class="bar" style="width:52.1%"></div></div><span class="v">63.4</span></div>
         </div>
-        <p class="small" style="margin:34px 0 14px">B2 구간 탐지 (GCD·AOL) · 천 doc/s</p>
+        <p class="small" style="margin:28px 0 14px">B2 구간 탐지 (GCD·AOL) · 천 doc/s</p>
         <div class="bars">
           <div class="bar-row"><span>S26 Ultra</span><div class="bar-track"><div class="bar acc" style="width:100%"></div></div><span class="v">309.6</span></div>
           <div class="bar-row"><span>노트북</span><div class="bar-track"><div class="bar" style="width:78.1%"></div></div><span class="v">241.8</span></div>
+          <div class="bar-row"><span>데스크톱</span><div class="bar-track"><div class="bar" style="width:74.8%"></div></div><span class="v">231.5</span></div>
         </div>
       </div>
       <div>
-        <table>
-          <thead><tr><th></th><th class="r">S26 Ultra</th><th class="r">노트북</th></tr></thead>
+        <table style="font-size:16px">
+          <thead><tr><th></th><th class="r">S26 Ultra</th><th class="r">노트북</th><th class="r">데스크톱</th></tr></thead>
           <tbody>
-            <tr><td class="muted">CPU 코어</td><td class="r num">8</td><td class="r num">20</td></tr>
-            <tr><td class="muted">1분 유지율 B1 / B2</td><td class="r num">87% / 85%</td><td class="r num">196%* / 99%</td></tr>
-            <tr><td class="muted">배터리</td><td class="r num">−1%/분</td><td class="r">충전 중</td></tr>
+            <tr><td class="muted">CPU</td><td class="r">Snapdragon<br>8 Elite Gen 5</td><td class="r">i7-12700H</td><td class="r">i7-6700</td></tr>
+            <tr><td class="muted">코어 / 스레드</td><td class="r num">8 / 8</td><td class="r num">14 / 20</td><td class="r num">4 / 8</td></tr>
+            <tr><td class="muted">출시</td><td class="r num">2026</td><td class="r num">2022</td><td class="r num">2015</td></tr>
+            <tr><td class="muted">1분 유지율 B1/B2</td><td class="r num">87/85%</td><td class="r num">196*/99%</td><td class="r num">101/100%</td></tr>
           </tbody>
         </table>
-        <p class="small" style="margin-top:16px">유지율 = 뒤쪽 속도 ÷ 앞쪽 속도. 폰은 1분 사이 발열로 13~15% 느려짐.<br>* 노트북은 측정 초반이 느렸음(전원·클럭 상태). 따로 잰 1분 측정에서는 B1 103.1M token/s — 그 경우에도 폰이 더 빠름.</p>
+        <p class="small" style="margin-top:12px">폰은 발열로 1분 사이 13~15% 감속, 배터리 −1%/분. 노트북의 "20"은 스레드 수 (고성능 6코어×2 + 저전력 8코어).<br>* 노트북은 측정 초반이 느렸음(균형 조정 전원 모드). 따로 잰 측정에서는 103.1M — 그래도 폰이 빠름.</p>
       </div>
     </div>
     <div class="foot"><span>입력은 실제 SynthID와 같은 계산 구조의 합성 데이터 · results/bench-*.json</span><span>7</span></div>
@@ -281,25 +284,28 @@ out = run_job(code, inputs)
   <!-- 8. 분산 처리 -->
   <section class="slide">
     <p class="kicker">결과 ② 같은 작업을 나눠 처리 (문서 200만 개 · 100묶음)</p>
-    <h2>폰을 붙이자 노트북 혼자보다 1.9배 빨라졌다</h2>
-    <div class="cols">
+    <h2>폰을 붙이면 노트북 혼자보다 1.9배, 세 대면 2배 빨라졌다</h2>
+    <div class="cols" style="grid-template-columns:1.15fr 1fr">
       <div>
-        <p class="small" style="margin:0 0 14px">처리 시간 · 초 (짧을수록 좋음)</p>
-        <div class="bars">
-          <div class="bar-row"><span>노트북만</span><div class="bar-track"><div class="bar" style="width:100%"></div></div><span class="v">17.7</span></div>
-          <div class="bar-row"><span>폰만</span><div class="bar-track"><div class="bar" style="width:85.4%"></div></div><span class="v">15.1</span></div>
-          <div class="bar-row"><span><b>노트북+폰</b></span><div class="bar-track"><div class="bar acc" style="width:53.4%"></div></div><span class="v hl">9.45</span></div>
+        <p class="small" style="margin:0 0 12px">처리 시간 · 초 (짧을수록 좋음)</p>
+        <div class="bars" style="gap:12px">
+          <div class="bar-row"><span>데스크톱만</span><div class="bar-track"><div class="bar" style="width:100%"></div></div><span class="v">29.0</span></div>
+          <div class="bar-row"><span>노트북만</span><div class="bar-track"><div class="bar" style="width:61.0%"></div></div><span class="v">17.7</span></div>
+          <div class="bar-row"><span>폰만</span><div class="bar-track"><div class="bar" style="width:52.1%"></div></div><span class="v">15.1</span></div>
+          <div class="bar-row"><span>노트북+데스크톱</span><div class="bar-track"><div class="bar" style="width:52.2%"></div></div><span class="v">15.2</span></div>
+          <div class="bar-row"><span><b>노트북+폰</b></span><div class="bar-track"><div class="bar acc" style="width:32.6%"></div></div><span class="v hl">9.45</span></div>
+          <div class="bar-row"><span><b>세 대 모두</b></span><div class="bar-track"><div class="bar acc" style="width:29.7%"></div></div><span class="v hl">8.62</span></div>
         </div>
-        <p class="small" style="margin-top:22px">노트북+폰은 3회 평균 (9.38 · 9.27 · 9.69초)</p>
+        <p class="small" style="margin-top:14px">여러 기기 조합은 3회 평균</p>
       </div>
-      <dl class="stat" style="margin:0;display:grid;gap:26px">
-        <div><dt>노트북 단독 대비</dt><dd class="big">1.87<small>배 빠름</small></dd></div>
-        <div><dt>이론상 최대(두 기기 속도의 합) 대비 효율</dt><dd class="big">86<small>%</small></dd></div>
-        <div><dt>분담 (묶음 수)</dt><dd style="font-size:21px">폰 <b class="num">53</b> · 노트북 <b class="num">47</b> <span class="small">— 빠른 기기가 자연히 더 많이</span></dd></div>
-        <div><dt>결과 일치</dt><dd style="font-size:19px">세 경우 평균 점수 모두 <span class="num">0.4999971211</span> — 어느 기기가 계산해도 같은 결과</dd></div>
+      <dl class="stat" style="margin:0;display:grid;gap:18px;align-content:start">
+        <div><dt>노트북 단독 대비</dt><dd class="big" style="font-size:52px">1.87<small>배 (노트북+폰)</small></dd><dd class="big" style="font-size:52px;margin-top:6px">2.05<small>배 (세 대)</small></dd></div>
+        <div><dt>세 대 분담 (평균 묶음 수)</dt><dd style="font-size:20px">폰 <b class="num">41</b> · 노트북 <b class="num">37</b> · 데스크톱 <b class="num">21</b></dd></div>
+        <div><dt>이론상 최대 대비 효율</dt><dd style="font-size:19px">노트북+폰 <b class="num">86%</b> · 세 대 <b class="num">74%</b><br><span class="small">데스크톱은 다른 장소에서 인터넷(Tailscale)으로 연결 → 주고받는 시간이 더 듦</span></dd></div>
+        <div><dt>결과 일치</dt><dd style="font-size:18px">모든 조합에서 평균 점수 <span class="num">0.4999971211</span></dd></div>
       </dl>
     </div>
-    <div class="foot"><span>results/cluster-*.json · 폰은 무선 디버깅(adb) 경유로 코디네이터 접속</span><span>8</span></div>
+    <div class="foot"><span>results/cluster-*.json · 폰은 무선 디버깅(adb), 데스크톱은 Tailscale로 코디네이터 접속</span><span>8</span></div>
   </section>
 
   <!-- 9. 에너지 관점 -->
@@ -311,7 +317,7 @@ out = run_job(code, inputs)
         <li>폰은 1분 전력 소모 측정 중 배터리 <b class="num">−1%</b> (B1·B2 각각)</li>
         <li>S26 Ultra 배터리(5,000mAh ≈ 19Wh 가정) 기준 <b>약 12W</b>로 추정<br><span class="small">배터리 표시가 1% 단위라 대략적인 값</span></li>
         <li>같은 시간 동안 노트북보다 더 많은 token을 처리 → <b>와트당 처리량은 폰이 유리할 가능성이 큼</b></li>
-        <li>GTX 1070은 보드 전력만 150W급</li>
+        <li>데스크톱(i7-6700)은 2015년 CPU로 폰의 절반 속도 · GTX 1070은 보드 전력만 150W급</li>
       </ul>
       <div>
         <p class="small" style="margin-top:0">정직하게 남은 것</p>
@@ -334,7 +340,7 @@ out = run_job(code, inputs)
       <div class="step"><span class="n">2</span><span>기능 구현 — B1·B2 벤치마크, 전 코어 워커, localStorage 저장</span><span class="ok">완료</span></div>
       <div class="step"><span class="n">3</span><span>폰 브라우저 테스트 — 같은 Wi-Fi에서 S26 Ultra 접속</span><span class="ok">완료</span></div>
       <div class="step"><span class="n">4</span><span>PWA 설치 — manifest·서비스 워커·아이콘, GitHub Pages 배포, 오프라인 확인</span><span class="ok">완료</span></div>
-      <div class="step"><span class="n">+</span><span>확장 — 코디네이터, 자동 작업 처리, 실제 폰으로 분산 측정</span><span class="ok acc">완료</span></div>
+      <div class="step"><span class="n">+</span><span>확장 — 코디네이터, 자동 작업 처리, 폰·노트북·데스크톱 분산 측정</span><span class="ok acc">완료</span></div>
     </div>
     <div class="foot"><span>커밋 기록: github.com/Selb1906/sparenode</span><span>10</span></div>
   </section>
@@ -359,7 +365,7 @@ out = run_job(code, inputs)
         <hr class="rule">
         <ul style="font-size:19px">
           <li>실제 SynthID 데이터와 HF 공식 구현과 같은 결과를 내는 작업으로 교체</li>
-          <li>데스크톱·공기계를 노드로 추가</li>
+          <li>공기계 추가, 데스크톱은 같은 장소에서 연결해 통신 비용 줄이기</li>
           <li>WebGPU로 폰 GPU까지 사용</li>
           <li>노트북 AI(Claude Code)가 직접 쓰는 도구(MCP)로 연결</li>
           <li>코디네이터 https화 → 설치한 앱에서 바로 접속</li>
