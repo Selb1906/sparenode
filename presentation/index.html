@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpareNode 발표</title>
+<style>
+  :root {
+    --font: system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Noto Sans KR", sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "D2Coding", monospace;
+    --paper: #f6f5f1;
+    --ink: #1d1d1b;
+    --ink-2: #5f5e58;
+    --ink-3: #9a988f;
+    --rule: #d9d6cc;
+    --accent: #b4441b;
+    --field: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #2a2a28; }
+  body { font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; word-break: keep-all; overflow: hidden; }
+
+  /* 1280x720 무대를 화면에 맞춰 확대·축소 */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center center; }
+  .slide {
+    position: absolute; inset: 0; background: var(--paper); padding: 56px 72px 48px;
+    display: none; flex-direction: column;
+  }
+  .slide.on { display: flex; }
+  .kicker { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: .02em; margin: 0 0 10px; }
+  h1 { font-size: 44px; line-height: 1.25; margin: 0 0 22px; letter-spacing: -0.02em; }
+  h2 { font-size: 34px; line-height: 1.3; margin: 0 0 26px; letter-spacing: -0.015em; }
+  p, li { font-size: 21px; line-height: 1.6; }
+  ul { margin: 0; padding-left: 24px; }
+  li { margin: 6px 0; }
+  .muted { color: var(--ink-2); }
+  .small { font-size: 16px; color: var(--ink-2); }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; flex: 1; min-height: 0; }
+  .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  hr.rule { border: 0; border-top: 1px solid var(--ink); margin: 0 0 18px; }
+
+  /* 표지 */
+  .title-slide { justify-content: center; }
+  .title-slide h1 { font-size: 64px; margin-bottom: 14px; }
+  .title-slide .sub { font-size: 26px; color: var(--ink-2); margin: 0 0 40px; }
+  .title-meta { border-top: 1px solid var(--ink); padding-top: 18px; display: flex; gap: 48px; font-size: 17px; color: var(--ink-2); }
+  .title-meta b { display: block; color: var(--ink); font-weight: 600; }
+  .logo { width: 72px; height: 72px; margin-bottom: 28px; }
+
+  /* 큰 숫자 */
+  .big { font-family: var(--mono); font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; }
+  .big small { font-size: 22px; font-weight: 400; color: var(--ink-2); margin-left: 6px; letter-spacing: 0; }
+  .stat dt { font-size: 15px; color: var(--ink-2); margin-bottom: 8px; }
+  .stat dd { margin: 0; }
+
+  /* 표 */
+  table { border-collapse: collapse; width: 100%; font-size: 18px; }
+  th { text-align: left; font-size: 14px; font-weight: 600; color: var(--ink-2); padding: 8px 12px 8px 0; border-bottom: 1px solid var(--ink); }
+  td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); }
+  .r { text-align: right; }
+  .hl { color: var(--accent); font-weight: 700; }
+
+  /* 가로 막대 */
+  .bars { display: flex; flex-direction: column; gap: 18px; }
+  .bar-row { display: grid; grid-template-columns: 150px 1fr 90px; align-items: center; gap: 16px; font-size: 19px; }
+  .bar-track { height: 30px; background: transparent; border-left: 1px solid var(--ink); }
+  .bar { height: 100%; background: var(--ink); }
+  .bar.acc { background: var(--accent); }
+  .bar-row .v { font-family: var(--mono); text-align: right; }
+
+  /* 화면 캡처 */
+  .shots { display: flex; gap: 28px; align-items: flex-start; flex: 1; min-height: 0; }
+  .shot { margin: 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .shot img { display: block; border: 1px solid var(--ink); background: #fff; object-fit: cover; object-position: top; }
+  .shot figcaption { font-size: 14px; color: var(--ink-2); }
+  .phone img { width: 206px; height: 420px; border-radius: 14px; }
+
+  /* 구조도 */
+  .flow { display: grid; grid-template-columns: 1fr 70px 1.1fr 70px 1fr; align-items: center; margin-top: 10px; }
+  .box { border: 1px solid var(--ink); background: var(--field); padding: 16px 18px; font-size: 17px; line-height: 1.5; }
+  .box b { display: block; font-size: 19px; margin-bottom: 4px; }
+  .box.acc { border-color: var(--accent); border-width: 2px; }
+  .arrow { text-align: center; font-size: 28px; color: var(--ink-2); }
+  .nodes { display: flex; flex-direction: column; gap: 10px; }
+  .nodes .box { padding: 10px 14px; }
+
+  pre { margin: 0; font-family: var(--mono); font-size: 16px; line-height: 1.55; background: var(--ink); color: var(--paper); padding: 20px 22px; white-space: pre-wrap; }
+  pre .c { color: #a8a69c; }
+  pre .k { color: #f0a27f; }
+
+  .step { display: grid; grid-template-columns: 48px 1fr auto; gap: 14px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 20px; }
+  .step .n { font-family: var(--mono); color: var(--ink-3); }
+  .step .ok { font-size: 15px; color: var(--ink-2); }
+  .step .ok.acc { color: var(--accent); font-weight: 600; }
+
+  .counter { position: fixed; right: 16px; bottom: 12px; font: 12px var(--mono); color: #9a988f; }
+  .hint { position: fixed; left: 16px; bottom: 12px; font: 12px var(--font); color: #9a988f; }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: none; overflow: visible; height: auto; }
+    .stage { position: static; transform: none !important; width: 1280px; height: auto; }
+    .slide { position: relative; display: flex !important; width: 1280px; height: 720px; page-break-after: always; }
+    .counter, .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 1. 표지 -->
+  <section class="slide title-slide">
+    <svg class="logo" viewBox="0 0 512 512" aria-hidden="true">
+      <rect width="512" height="512" fill="#1d1d1b"/>
+      <g fill="#f6f5f1"><rect x="146" y="146" width="56" height="56" rx="6"/><rect x="228" y="146" width="56" height="56" rx="6"/><rect x="310" y="146" width="56" height="56" rx="6"/><rect x="146" y="228" width="56" height="56" rx="6"/><rect x="228" y="228" width="56" height="56" rx="6"/><rect x="146" y="310" width="56" height="56" rx="6"/><rect x="228" y="310" width="56" height="56" rx="6"/><rect x="310" y="310" width="56" height="56" rx="6"/></g>
+      <rect x="310" y="228" width="56" height="56" rx="6" fill="#d9572a"/>
+    </svg>
+    <p class="kicker">에너지시스템과AI · Claude Code 실습 미션</p>
+    <h1>SpareNode</h1>
+    <p class="sub">놀고 있는 스마트폰을 AI 연산 노드로 쓰는 PWA</p>
+    <div class="title-meta">
+      <div><b>발표자</b>&nbsp;</div>
+      <div><b>설치 주소</b>selb1906.github.io/sparenode</div>
+      <div><b>저장소</b>github.com/Selb1906/sparenode</div>
+    </div>
+  </section>
+
+  <!-- 2. 문제 -->
+  <section class="slide">
+    <p class="kicker">왜 만들었나</p>
+    <h2>연구용 컴퓨팅은 늘 모자라고,<br>주머니 속 8코어는 놀고 있다</h2>
+    <div class="cols">
+      <ul>
+        <li>노트북 AI가 SSH로 데스크톱에 작업을 나눠 주며 쓰는 중</li>
+        <li>그래도 반복 계산이 많은 실험(워터마크 검출 점수 계산 등)은 오래 걸림</li>
+        <li>데스크톱 GTX 1070은 FP16이 매우 느린 세대 → 최신 폰이 더 빠를 때도 있음</li>
+        <li>폰·공기계는 사실상 <b>미니 PC</b>인데 연산에는 쓰지 않음</li>
+      </ul>
+      <div>
+        <p class="small" style="margin-top:0">기존 방법의 불편함</p>
+        <hr class="rule">
+        <ul class="muted" style="font-size:19px">
+          <li>폰에서 연산하려면 Termux 등 별도 앱 설치·설정</li>
+          <li>검증 안 된 분산 연산 앱은 회원가입·권한 요구</li>
+          <li>작업이 바뀔 때마다 앱을 새로 만들어야 하는 구조는 곤란</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span>SpareNode</span><span>2</span></div>
+  </section>
+
+  <!-- 3. 구조 -->
+  <section class="slide">
+    <p class="kicker">구조</p>
+    <h2>노트북이 나누고, 켜져 있는 기기가 알아서 계산해 돌려준다</h2>
+    <div class="flow">
+      <div class="box"><b>노트북 AI · 스크립트</b>작업 코드와 데이터 묶음 제출<br><span class="small num">run_job(code, inputs)</span></div>
+      <div class="arrow">→</div>
+      <div class="box acc"><b>코디네이터 (노트북)</b>빈 코어가 있는 기기에 묶음 자동 배정<br>끊기면 다른 기기로 재배정 · 토큰 인증<br><span class="small">파이썬 표준 라이브러리만 사용</span></div>
+      <div class="arrow">⇄</div>
+      <div class="nodes">
+        <div class="box"><b>폰 SpareNode 앱</b>8코어 워커가 자동 실행</div>
+        <div class="box"><b>노트북 브라우저</b>20코어</div>
+        <div class="box" style="border-style:dashed"><b>데스크톱 · 공기계</b>같은 앱으로 참여 (예정)</div>
+      </div>
+    </div>
+    <div class="cols-3" style="margin-top:34px">
+      <p style="margin:0"><b>버튼 없이</b><br><span class="muted" style="font-size:18px">앱을 열면 자동 접속, 작업이 오면 바로 처리</span></p>
+      <p style="margin:0"><b>앱은 그대로</b><br><span class="muted" style="font-size:18px">작업 코드를 실행 중에 받아서, 작업이 바뀌어도 앱 재배포 불필요</span></p>
+      <p style="margin:0"><b>결과만 반환</b><br><span class="muted" style="font-size:18px">RAM을 빌리는 게 아니라 일을 나눠 맡김</span></p>
+    </div>
+    <div class="foot"><span>SpareNode</span><span>3</span></div>
+  </section>
+
+  <!-- 4. 왜 PWA -->
+  <section class="slide">
+    <p class="kicker">왜 PWA인가</p>
+    <h2>설치 파일·회원가입 없이, 브라우저 격리 안에서 안전하게</h2>
+    <div class="cols" style="align-items:start">
+      <table>
+        <thead><tr><th></th><th>PWA (이번 방식)</th><th>네이티브 앱 / Termux</th></tr></thead>
+        <tbody>
+          <tr><td class="muted">설치</td><td>주소 열고 '앱 설치'</td><td>스토어·APK·패키지 설정</td></tr>
+          <tr><td class="muted">안드로이드·아이폰</td><td>하나로 둘 다</td><td>각각 따로</td></tr>
+          <tr><td class="muted">보안</td><td>브라우저 샌드박스<br><span class="small">폰 파일·다른 앱 접근 불가</span></td><td>앱 권한에 따라 다름</td></tr>
+          <tr><td class="muted">오프라인</td><td>서비스 워커로 실행</td><td>가능</td></tr>
+          <tr><td class="muted">한계</td><td colspan="2">화면이 켜져 있어야 계산 (백그라운드 실행 불가) → 측정·연결 중 화면 꺼짐 방지</td></tr>
+        </tbody>
+      </table>
+      <div>
+        <p class="small" style="margin-top:0">PWA를 이루는 파일</p>
+        <hr class="rule">
+        <ul style="font-size:19px">
+          <li><span class="num">manifest.json</span> 이름·아이콘·전체 화면</li>
+          <li><span class="num">service-worker.js</span> 앱 파일 저장, 오프라인 실행</li>
+          <li><span class="num">icons/</span> 192·512·180px (SVG 하나에서 생성)</li>
+        </ul>
+        <p class="small" style="margin-top:22px">글꼴 원칙</p>
+        <hr class="rule">
+        <p style="font-size:19px;margin:0">구글 글꼴 등 외부 글꼴 연결 없음 → 기기 기본 글꼴만 사용해 첫 화면 로딩을 빠르게</p>
+      </div>
+    </div>
+    <div class="foot"><span>SpareNode</span><span>4</span></div>
+  </section>
+
+  <!-- 5. 앱 화면 -->
+  <section class="slide">
+    <p class="kicker">앱 화면</p>
+    <h2 style="margin-bottom:18px">홈 화면에 설치한 앱이 노트북의 작업을 자동으로 처리</h2>
+    <div class="shots">
+      <figure class="shot phone"><img src="img/phone-connected.png" alt="폰 앱: 코디네이터 연결됨, 작업 대기"><figcaption>폰 · 연결됨, 작업 대기</figcaption></figure>
+      <figure class="shot phone"><img src="img/phone-working.png" alt="폰 앱: 작업 처리 중 8/8코어"><figcaption>폰 · 작업 처리 중 (8/8코어)</figcaption></figure>
+      <figure class="shot phone"><img src="img/phone-bench-log.png" alt="폰 앱: 코디네이터 설정과 작업 기록"><figcaption>폰 · 설정과 작업 기록</figcaption></figure>
+      <figure class="shot"><img src="img/laptop-full.png" alt="노트북 화면: 연결된 기기, 벤치마크, 작업 기록" style="width:420px;height:420px;object-position:top left"><figcaption>노트북 · 같은 앱, 넓은 화면</figcaption></figure>
+    </div>
+    <p class="small" style="margin:8px 0 0">디자인: 그라데이션·그림자·카드 없이 실험 기록지처럼. 강조색 1개(적갈색)는 '연결·처리 중'에만 사용</p>
+    <div class="foot"><span>SpareNode</span><span>5</span></div>
+  </section>
+
+  <!-- 6. 작업 보내기 -->
+  <section class="slide">
+    <p class="kicker">작업이 바뀌어도 앱은 그대로</p>
+    <h2>작업 = <span class="num">run(input)</span> 함수 하나. 노트북에서 보내면 끝</h2>
+    <div class="cols" style="align-items:start;flex:none">
+<pre><span class="c">// tasks/synthid_seeded.js — 폰·노트북이 받아 실행하는 작업</span>
+<span class="k">function</span> run(input) {
+  <span class="k">const</span> { seed, docs, tokens, keys } = input;
+  <span class="c">// 문서 생성 → 5-gram 해시 × 30 레이어 → g-value 평균</span>
+  ...
+  <span class="k">return</span> { n: docs, mean: total / docs };
+}</pre>
+<pre><span class="c"># 노트북 AI(또는 사람)가 쓰는 쪽</span>
+<span class="k">from</span> sparenode_client <span class="k">import</span> run_job
+
+inputs = [{<span class="k">"seed"</span>: i, <span class="k">"docs"</span>: 20000, ...}
+          <span class="k">for</span> i <span class="k">in</span> range(100)]   <span class="c"># 100묶음</span>
+out = run_job(code, inputs)
+<span class="c"># 분담: {'S26U': 53, '노트북': 47}</span></pre>
+    </div>
+    <ul style="margin-top:24px;font-size:19px">
+      <li>코디네이터는 묶음을 <b>빈 코어가 생기는 대로</b> 보냄 → 빠른 기기가 자연히 더 많이 맡음</li>
+      <li>벤치마크 중인 기기는 작업을 잠시 받지 않음, 끊긴 기기의 묶음은 다른 기기로 재배정</li>
+    </ul>
+    <div class="foot"><span>SpareNode</span><span>6</span></div>
+  </section>
+
+  <!-- 7. 벤치마크 -->
+  <section class="slide">
+    <p class="kicker">결과 ① 기기 단독 성능 (1분 측정, 같은 시각)</p>
+    <h2>S26 Ultra 8코어가 노트북 20코어보다 빨랐다</h2>
+    <div class="cols">
+      <div>
+        <p class="small" style="margin:0 0 14px">B1 SynthID 점수 계산 · 백만 token/s</p>
+        <div class="bars">
+          <div class="bar-row"><span>S26 Ultra</span><div class="bar-track"><div class="bar acc" style="width:100%"></div></div><span class="v">121.6</span></div>
+          <div class="bar-row"><span>노트북</span><div class="bar-track"><div class="bar" style="width:58.5%"></div></div><span class="v">71.1</span></div>
+        </div>
+        <p class="small" style="margin:34px 0 14px">B2 구간 탐지 (GCD·AOL) · 천 doc/s</p>
+        <div class="bars">
+          <div class="bar-row"><span>S26 Ultra</span><div class="bar-track"><div class="bar acc" style="width:100%"></div></div><span class="v">309.6</span></div>
+          <div class="bar-row"><span>노트북</span><div class="bar-track"><div class="bar" style="width:78.1%"></div></div><span class="v">241.8</span></div>
+        </div>
+      </div>
+      <div>
+        <table>
+          <thead><tr><th></th><th class="r">S26 Ultra</th><th class="r">노트북</th></tr></thead>
+          <tbody>
+            <tr><td class="muted">CPU 코어</td><td class="r num">8</td><td class="r num">20</td></tr>
+            <tr><td class="muted">1분 유지율 B1 / B2</td><td class="r num">87% / 85%</td><td class="r num">196%* / 99%</td></tr>
+            <tr><td class="muted">배터리</td><td class="r num">−1%/분</td><td class="r">충전 중</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top:16px">유지율 = 뒤쪽 속도 ÷ 앞쪽 속도. 폰은 1분 사이 발열로 13~15% 느려짐.<br>* 노트북은 측정 초반이 느렸음(전원·클럭 상태). 따로 잰 1분 측정에서는 B1 103.1M token/s — 그 경우에도 폰이 더 빠름.</p>
+      </div>
+    </div>
+    <div class="foot"><span>입력은 실제 SynthID와 같은 계산 구조의 합성 데이터 · results/bench-*.json</span><span>7</span></div>
+  </section>
+
+  <!-- 8. 분산 처리 -->
+  <section class="slide">
+    <p class="kicker">결과 ② 같은 작업을 나눠 처리 (문서 200만 개 · 100묶음)</p>
+    <h2>폰을 붙이자 노트북 혼자보다 1.9배 빨라졌다</h2>
+    <div class="cols">
+      <div>
+        <p class="small" style="margin:0 0 14px">처리 시간 · 초 (짧을수록 좋음)</p>
+        <div class="bars">
+          <div class="bar-row"><span>노트북만</span><div class="bar-track"><div class="bar" style="width:100%"></div></div><span class="v">17.7</span></div>
+          <div class="bar-row"><span>폰만</span><div class="bar-track"><div class="bar" style="width:85.4%"></div></div><span class="v">15.1</span></div>
+          <div class="bar-row"><span><b>노트북+폰</b></span><div class="bar-track"><div class="bar acc" style="width:53.4%"></div></div><span class="v hl">9.45</span></div>
+        </div>
+        <p class="small" style="margin-top:22px">노트북+폰은 3회 평균 (9.38 · 9.27 · 9.69초)</p>
+      </div>
+      <dl class="stat" style="margin:0;display:grid;gap:26px">
+        <div><dt>노트북 단독 대비</dt><dd class="big">1.87<small>배 빠름</small></dd></div>
+        <div><dt>이론상 최대(두 기기 속도의 합) 대비 효율</dt><dd class="big">86<small>%</small></dd></div>
+        <div><dt>분담 (묶음 수)</dt><dd style="font-size:21px">폰 <b class="num">53</b> · 노트북 <b class="num">47</b> <span class="small">— 빠른 기기가 자연히 더 많이</span></dd></div>
+        <div><dt>결과 일치</dt><dd style="font-size:19px">세 경우 평균 점수 모두 <span class="num">0.4999971211</span> — 어느 기기가 계산해도 같은 결과</dd></div>
+      </dl>
+    </div>
+    <div class="foot"><span>results/cluster-*.json · 폰은 무선 디버깅(adb) 경유로 코디네이터 접속</span><span>8</span></div>
+  </section>
+
+  <!-- 9. 에너지 관점 -->
+  <section class="slide">
+    <p class="kicker">에너지 관점</p>
+    <h2>새 장비를 사지 않고, 이미 있는 기기의 유휴 연산을 쓴다</h2>
+    <div class="cols">
+      <ul>
+        <li>폰은 1분 전력 소모 측정 중 배터리 <b class="num">−1%</b> (B1·B2 각각)</li>
+        <li>S26 Ultra 배터리(5,000mAh ≈ 19Wh 가정) 기준 <b>약 12W</b>로 추정<br><span class="small">배터리 표시가 1% 단위라 대략적인 값</span></li>
+        <li>같은 시간 동안 노트북보다 더 많은 token을 처리 → <b>와트당 처리량은 폰이 유리할 가능성이 큼</b></li>
+        <li>GTX 1070은 보드 전력만 150W급</li>
+      </ul>
+      <div>
+        <p class="small" style="margin-top:0">정직하게 남은 것</p>
+        <hr class="rule">
+        <ul class="muted" style="font-size:19px">
+          <li>노트북·데스크톱 전력은 아직 직접 측정하지 않음 → 전력계로 와트당 처리량 비교 예정</li>
+          <li>폰은 1분 사이 13~15% 감속 → 10분 지속 측정으로 실사용 성능 확인 예정</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span>SpareNode</span><span>9</span></div>
+  </section>
+
+  <!-- 10. 진행 과정 -->
+  <section class="slide">
+    <p class="kicker">미션 진행</p>
+    <h2>Claude Code에 요청 → 확인 → 커밋을 반복해 완성</h2>
+    <div>
+      <div class="step"><span class="n">1</span><span>화면 만들기 — 기기 정보·벤치마크 표·코디네이터 설정·작업 기록</span><span class="ok">완료</span></div>
+      <div class="step"><span class="n">2</span><span>기능 구현 — B1·B2 벤치마크, 전 코어 워커, localStorage 저장</span><span class="ok">완료</span></div>
+      <div class="step"><span class="n">3</span><span>폰 브라우저 테스트 — 같은 Wi-Fi에서 S26 Ultra 접속</span><span class="ok">완료</span></div>
+      <div class="step"><span class="n">4</span><span>PWA 설치 — manifest·서비스 워커·아이콘, GitHub Pages 배포, 오프라인 확인</span><span class="ok">완료</span></div>
+      <div class="step"><span class="n">+</span><span>확장 — 코디네이터, 자동 작업 처리, 실제 폰으로 분산 측정</span><span class="ok acc">완료</span></div>
+    </div>
+    <div class="foot"><span>커밋 기록: github.com/Selb1906/sparenode</span><span>10</span></div>
+  </section>
+
+  <!-- 11. 한계와 다음 -->
+  <section class="slide">
+    <p class="kicker">한계와 다음 단계</p>
+    <h2>다음: 실제 연구 데이터로, 더 많은 기기로</h2>
+    <div class="cols">
+      <div>
+        <p class="small" style="margin-top:0">지금의 한계</p>
+        <hr class="rule">
+        <ul style="font-size:19px">
+          <li>벤치마크 입력은 합성 데이터 (계산 구조만 동일)</li>
+          <li>설치한 앱(https)은 Wi-Fi의 노트북에 직접 접속 불가 → 지금은 adb 무선 디버깅으로 연결</li>
+          <li>화면이 켜져 있어야 계산 (PWA 제약)</li>
+          <li>외부 인터넷 접속(중계 서버)은 공인 IP 환경이 없어 보류</li>
+        </ul>
+      </div>
+      <div>
+        <p class="small" style="margin-top:0">다음 단계</p>
+        <hr class="rule">
+        <ul style="font-size:19px">
+          <li>실제 SynthID 데이터와 HF 공식 구현과 같은 결과를 내는 작업으로 교체</li>
+          <li>데스크톱·공기계를 노드로 추가</li>
+          <li>WebGPU로 폰 GPU까지 사용</li>
+          <li>노트북 AI(Claude Code)가 직접 쓰는 도구(MCP)로 연결</li>
+          <li>코디네이터 https화 → 설치한 앱에서 바로 접속</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span>SpareNode</span><span>11</span></div>
+  </section>
+
+  <!-- 12. 마무리 -->
+  <section class="slide title-slide">
+    <p class="kicker">정리</p>
+    <h1 style="font-size:52px">주머니 속 폰이<br>연구용 연산 노드가 됐다</h1>
+    <p class="sub" style="margin-bottom:34px">설치는 주소 하나 · 작업은 노트북이 보내고 · 폰은 켜 두기만</p>
+    <div class="title-meta">
+      <div><b>앱 설치</b>selb1906.github.io/sparenode</div>
+      <div><b>코드</b>github.com/Selb1906/sparenode</div>
+      <div><b>측정 결과</b>results/</div>
+    </div>
+  </section>
+
+</div>
+<div class="hint">← → 이동 · F 전체 화면</div>
+<div class="counter" id="counter"></div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const stage = document.getElementById('stage');
+  let i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    document.getElementById('counter').textContent = `${i + 1} / ${slides.length}`;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+
+  function fit() {
+    const s = Math.min(innerWidth / 1280, innerHeight / 720);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+
+  addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {});
+    }
+  });
+  addEventListener('click', (e) => { if (e.clientX > innerWidth / 3) show(i + 1); else show(i - 1); });
+  addEventListener('resize', fit);
+  fit();
+  show(i);
+</script>
+</body>
+</html>
