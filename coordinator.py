@@ -78,6 +78,7 @@ class Node:
         self.cores = max(1, min(int(info.get("cores") or 1), 64))
         self.platform = str(info.get("platform") or "")[:40]
         self.paused = False
+        self.bench = {}  # 기기가 알려 준 벤치마크 결과
         self.inflight = {}  # (job_id, chunk_id) -> 보낸 시각
         self.tasks_sent = set()
         self.done = 0
@@ -97,6 +98,7 @@ class Node:
             "paused": self.paused,
             "running": len(self.inflight),
             "done": self.done,
+            "bench": self.bench,
         }
 
 
@@ -516,6 +518,10 @@ async def serve_node(coord, req, reader, writer):
                 coord.requeue(node, "벤치마크 중")
             elif kind == "resume":
                 node.paused = False
+            elif kind == "bench":
+                if isinstance(msg.get("results"), dict):
+                    node.bench = msg["results"]
+                    coord.broadcast_status()
             elif kind == "ping":
                 ws.send_json({"type": "pong"})
             coord.dispatch()

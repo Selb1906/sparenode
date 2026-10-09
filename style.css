@@ -277,9 +277,6 @@ button:disabled {
   .btn { padding: 11px 18px; }
   .btn-sm { padding: 8px 14px; }
 
-  /* 좁은 화면에서는 비교 열(노트북·데스크톱)을 숨기고 이 기기 값만 */
-  .bench th:nth-child(4), .bench td:nth-child(4),
-  .bench th:nth-child(5), .bench td:nth-child(5) { display: none; }
 }
 
 /* ---------- 2단계: 실행 조작부·결과 ---------- */
@@ -394,6 +391,16 @@ button:disabled {
 .nodes td.paused { color: var(--ink-3); }
 
 @media (max-width: 720px) {
-  .nodes th:nth-child(4), .nodes td:nth-child(4),
-  .nodes th:nth-child(5), .nodes td:nth-child(5) { display: table-cell; }
+  /* 좁은 화면에서는 '처리 중' 열을 숨긴다 (상단 상태 줄에 이미 표시) */
+  .nodes th:nth-child(5), .nodes td:nth-child(5) { display: none; }
+  .nodes th, .nodes td { padding-right: 6px; }
 }
+
+/* 제목 줄에 버튼이 있을 때 아래 설명과 겹치지 않게 */
+.section-head {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.section-head h2 { margin-bottom: 0; }

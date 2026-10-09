@@ -1,6 +1,6 @@
 // SpareNode 서비스 워커 - 앱 파일을 저장해 두고 인터넷 없이도 열리게 한다.
 // 파일을 고친 뒤에는 CACHE 버전을 올려야 설치된 앱이 새 파일로 바뀐다.
-const CACHE = 'sparenode-v3';
+const CACHE = 'sparenode-v4';
 
 const FILES = [
   './',

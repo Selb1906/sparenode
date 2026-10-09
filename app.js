@@ -258,6 +258,7 @@ async function measure(bench) {
     };
     save(STORE_RESULTS, results);
     renderResult(bench);
+    node.reportBench();
     log(`${BENCH[bench].name} 완료: ${compact.format(results[bench].rate)} ${BENCH[bench].unit}`);
   } catch (err) {
     renderResult(bench);
@@ -346,11 +347,13 @@ const node = (() => {
     for (const n of msg.nodes) {
       const tr = document.createElement('tr');
       if (n.id === cfg.id) tr.className = 'me';
-      const cells = [n.name, n.cores, n.paused ? '벤치마크 중' : n.running, n.done];
+      const b = n.bench || {};
+      const rate = (k) => (b[k] ? compact.format(b[k].rate) : '—');
+      const cells = [n.name, n.cores, rate('b1'), rate('b2'), n.paused ? '벤치마크 중' : n.running, n.done];
       cells.forEach((v, i) => {
         const td = document.createElement('td');
         td.textContent = v;
-        if (i > 0) td.className = 'r num' + (n.paused && i === 2 ? ' paused' : '');
+        if (i > 0) td.className = 'r num' + (n.paused && i === 4 ? ' paused' : '');
         tr.append(td);
       });
       rows.append(tr);
@@ -482,6 +485,7 @@ const node = (() => {
         clearInterval(pingTimer);
         pingTimer = setInterval(() => send({ type: 'ping' }), 15000);
         if (paused) send({ type: 'pause' });
+        reportBench();
         showState();
       } else if (m.type === 'error') {
         authFailed = true;
@@ -530,6 +534,13 @@ const node = (() => {
     clearTimeout(retryTimer);
     if (ws) ws.close();
     else { state = 'off'; showState(); }
+  }
+
+  // 이 기기의 벤치마크 결과를 코디네이터에 알려 '연결된 기기' 표에서 비교
+  function reportBench() {
+    const slim = {};
+    for (const [k, r] of Object.entries(results)) slim[k] = { rate: r.rate, seconds: r.seconds, sustain: r.sustain };
+    send({ type: 'bench', results: slim });
   }
 
   // 벤치마크 중에는 작업을 받지 않는다 (CPU를 나눠 쓰면 둘 다 부정확해짐)
@@ -582,7 +593,7 @@ const node = (() => {
     if (cfg.auto && cfg.token && location.protocol !== 'file:') connect();
   }
 
-  return { initForm, pause };
+  return { initForm, pause, reportBench };
 })();
 
 // ---------- PWA: 서비스 워커 등록 (https 또는 localhost에서만 동작) ----------
