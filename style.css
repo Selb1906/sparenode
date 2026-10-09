@@ -1,0 +1,283 @@
+/* SpareNode - 화면 스타일
+   원칙: 도구처럼 보이게. 그라데이션·그림자·글로우 없음, 강조색 1개,
+   카드 대신 구분선, 숫자는 고정폭. 외부 글꼴 없이 기기 기본 글꼴만 사용. */
+
+:root {
+  --font: system-ui, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+          "Malgun Gothic", "맑은 고딕", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "D2Coding",
+          "Roboto Mono", monospace;
+
+  --paper: #f6f5f1;      /* 종이 느낌의 바탕 */
+  --ink: #1d1d1b;        /* 본문 */
+  --ink-2: #5f5e58;      /* 보조 글씨 */
+  --ink-3: #9a988f;      /* 빈 값·비활성 */
+  --rule: #d9d6cc;       /* 구분선 */
+  --field: #ffffff;
+  --accent: #b4441b;     /* 유일한 강조색: 실행 중·주요 버튼 */
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+}
+
+button, input { font: inherit; color: inherit; }
+
+/* ---------- 상단 줄 ---------- */
+.topbar {
+  border-bottom: 1px solid var(--ink);
+  padding-top: env(safe-area-inset-top);
+}
+
+.topbar-inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.app-sub {
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.conn {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-3);
+}
+
+.conn.online .dot { background: var(--accent); border-color: var(--accent); }
+
+/* ---------- 본문 ---------- */
+.page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 8px 20px 64px;
+}
+
+.section {
+  padding: 22px 0 26px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section h2 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.note {
+  margin: -4px 0 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+
+.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.muted { color: var(--ink-3); }
+
+/* 기기 사양: 표 대신 한 줄 읽기 */
+.spec {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px 24px;
+}
+
+.spec dt {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.spec dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+}
+
+/* 벤치마크 표 */
+.table-wrap { overflow-x: auto; }
+
+.bench {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.bench th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 6px 10px 6px 0;
+  border-bottom: 1px solid var(--ink);
+  white-space: nowrap;
+}
+
+.bench td {
+  padding: 12px 10px 12px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.bench td small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.bench .unit {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.bench .r { text-align: right; }
+
+/* 버튼: 테두리만, 주요 버튼만 강조색 */
+.btn,
+.btn-sm {
+  border: 1px solid var(--ink);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn { padding: 8px 16px; font-size: 14px; }
+.btn-sm { padding: 4px 12px; font-size: 13px; }
+
+.btn:hover:not(:disabled),
+.btn-sm:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.form .btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* 2열: 코디네이터 / 작업 기록 */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 40px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.form input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--field);
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.form input:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.log li { padding: 3px 0; }
+
+.log time {
+  color: var(--ink-3);
+  margin-right: 10px;
+}
+
+/* ---------- 휴대폰 ---------- */
+@media (max-width: 720px) {
+  .two-col { grid-template-columns: 1fr; }
+
+  .page { padding: 0 16px 48px; }
+  .topbar-inner { padding: 12px 16px; }
+
+  .app-sub { display: block; margin: 2px 0 0; }
+
+  .btn { padding: 11px 18px; }
+  .btn-sm { padding: 8px 14px; }
+
+  /* 좁은 화면에서는 비교 열(노트북·데스크톱)을 숨기고 이 기기 값만 */
+  .bench th:nth-child(4), .bench td:nth-child(4),
+  .bench th:nth-child(5), .bench td:nth-child(5) { display: none; }
+}

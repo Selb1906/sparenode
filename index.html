@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5f1">
+  <title>SpareNode</title>
+  <!-- 외부 글꼴 없이 기기 기본 글꼴만 사용 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 class="app-name">SpareNode <span class="app-sub">남는 기기로 연산 나누기</span></h1>
+      <p class="conn" id="connStatus"><span class="dot"></span>코디네이터 미연결</p>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- 이 기기 정보 -->
+    <section class="section" aria-labelledby="h-device">
+      <h2 id="h-device">이 기기</h2>
+      <dl class="spec">
+        <div><dt>CPU 코어</dt><dd id="specCores" class="num">—</dd></div>
+        <div><dt>메모리(추정)</dt><dd id="specMem" class="num">—</dd></div>
+        <div><dt>WebGPU</dt><dd id="specGpu">확인 중</dd></div>
+        <div><dt>배터리</dt><dd id="specBattery" class="num">—</dd></div>
+        <div><dt>화면 꺼짐 방지</dt><dd>꺼짐</dd></div>
+      </dl>
+    </section>
+
+    <!-- 벤치마크 -->
+    <section class="section" aria-labelledby="h-bench">
+      <div class="section-head">
+        <h2 id="h-bench">벤치마크</h2>
+        <button class="btn" type="button" disabled>전체 실행</button>
+      </div>
+      <p class="note">같은 작업을 노트북·데스크톱·이 기기에서 돌려 비교합니다. 10분 지속 성능과 배터리 소모도 함께 기록합니다.</p>
+
+      <div class="table-wrap">
+        <table class="bench">
+          <thead>
+            <tr>
+              <th scope="col">작업</th>
+              <th scope="col">단위</th>
+              <th scope="col" class="r">이 기기</th>
+              <th scope="col" class="r">노트북</th>
+              <th scope="col" class="r">데스크톱</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>B1</b> SynthID 점수 계산<small>token별 g-value, 문서 1,000개</small></td>
+              <td class="unit">token/s</td>
+              <td class="r num">—</td>
+              <td class="r num muted">—</td>
+              <td class="r num muted">—</td>
+              <td class="r"><button class="btn-sm" type="button" disabled>실행</button></td>
+            </tr>
+            <tr>
+              <td><b>B2</b> 구간 탐지 (GCD·AOL)<small>3,000 token 점수열</small></td>
+              <td class="unit">doc/s</td>
+              <td class="r num">—</td>
+              <td class="r num muted">—</td>
+              <td class="r num muted">—</td>
+              <td class="r"><button class="btn-sm" type="button" disabled>실행</button></td>
+            </tr>
+            <tr>
+              <td><b>B4</b> 임베딩 추론<small>소형 문장 임베딩, WebGPU</small></td>
+              <td class="unit">sent/s</td>
+              <td class="r num">—</td>
+              <td class="r num muted">—</td>
+              <td class="r num muted">—</td>
+              <td class="r"><button class="btn-sm" type="button" disabled>실행</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <!-- 코디네이터 연결 설정 -->
+      <section class="section" aria-labelledby="h-coord">
+        <h2 id="h-coord">코디네이터</h2>
+        <p class="note">노트북(나중에는 중계 서버)으로 밖으로 연결해 작업을 받습니다.</p>
+        <form class="form" onsubmit="return false">
+          <label>주소
+            <input type="text" placeholder="ws://192.168.0.10:8765" autocomplete="off" spellcheck="false">
+          </label>
+          <label>접속 토큰
+            <input type="password" placeholder="노트북에 표시된 토큰" autocomplete="off">
+          </label>
+          <button class="btn" type="submit" disabled>연결</button>
+        </form>
+      </section>
+
+      <!-- 작업 기록 -->
+      <section class="section" aria-labelledby="h-log">
+        <h2 id="h-log">작업 기록</h2>
+        <ol class="log" id="log">
+          <li><time>--:--:--</time>아직 기록이 없습니다.</li>
+        </ol>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
