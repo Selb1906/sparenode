@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 꽉 찬 바탕(마스커블 아이콘용) + 가운데 80% 안에 3x3 노드 격자, 한 칸만 강조색 -->
+  <rect width="512" height="512" fill="#1d1d1b"/>
+  <g fill="#f6f5f1">
+    <rect x="146" y="146" width="56" height="56" rx="6"/>
+    <rect x="228" y="146" width="56" height="56" rx="6"/>
+    <rect x="310" y="146" width="56" height="56" rx="6"/>
+    <rect x="146" y="228" width="56" height="56" rx="6"/>
+    <rect x="228" y="228" width="56" height="56" rx="6"/>
+    <rect x="146" y="310" width="56" height="56" rx="6"/>
+    <rect x="228" y="310" width="56" height="56" rx="6"/>
+    <rect x="310" y="310" width="56" height="56" rx="6"/>
+  </g>
+  <rect x="310" y="228" width="56" height="56" rx="6" fill="#d9572a"/>
+</svg>

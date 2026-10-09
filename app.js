@@ -261,6 +261,13 @@ $('runAll').addEventListener('click', async () => {
   for (const bench of Object.keys(BENCH)) await measure(bench);
 });
 
+// ---------- PWA: 서비스 워커 등록 (https 또는 localhost에서만 동작) ----------
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register('service-worker.js').catch((err) => {
+    log(`서비스 워커 등록 실패: ${err.message}`);
+  });
+}
+
 // ---------- 시작 ----------
 if (location.protocol === 'file:') $('fileWarn').hidden = false;
 Object.keys(BENCH).forEach(renderResult);
