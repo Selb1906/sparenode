@@ -25,7 +25,7 @@
         <div><dt>메모리(추정)</dt><dd id="specMem" class="num">—</dd></div>
         <div><dt>WebGPU</dt><dd id="specGpu">확인 중</dd></div>
         <div><dt>배터리</dt><dd id="specBattery" class="num">—</dd></div>
-        <div><dt>화면 꺼짐 방지</dt><dd>꺼짐</dd></div>
+        <div><dt>화면 꺼짐 방지</dt><dd id="specWake">측정 중에만 켜짐</dd></div>
       </dl>
     </section>
 
@@ -33,9 +33,19 @@
     <section class="section" aria-labelledby="h-bench">
       <div class="section-head">
         <h2 id="h-bench">벤치마크</h2>
-        <button class="btn" type="button" disabled>전체 실행</button>
+        <div class="controls">
+          <label class="sel">측정 시간
+            <select id="duration">
+              <option value="5">5초 (빠르게)</option>
+              <option value="60">1분</option>
+              <option value="600">10분 (지속 성능)</option>
+            </select>
+          </label>
+          <button class="btn" type="button" id="runAll">전체 실행</button>
+        </div>
       </div>
-      <p class="note">같은 작업을 노트북·데스크톱·이 기기에서 돌려 비교합니다. 10분 지속 성능과 배터리 소모도 함께 기록합니다.</p>
+      <p class="note">모든 CPU 코어에 일을 나눠 정해진 시간 동안 돌립니다. 1분 이상 측정하면 유지율(뒤쪽 속도 ÷ 앞쪽 속도)로 발열 때문에 느려지는 정도도 보여 줍니다. 노트북·데스크톱 칸은 코디네이터를 연결하면 채워집니다.</p>
+      <p class="warn" id="fileWarn" hidden>파일을 직접 열면(file://) 브라우저가 계산용 워커를 막습니다. 폴더에서 <code>py -m http.server 8000</code>을 실행하고 <code>http://localhost:8000</code>으로 열어 주세요.</p>
 
       <div class="table-wrap">
         <table class="bench">
@@ -51,23 +61,23 @@
           </thead>
           <tbody>
             <tr>
-              <td><b>B1</b> SynthID 점수 계산<small>token별 g-value, 문서 1,000개</small></td>
+              <td><b>B1</b> SynthID 점수 계산<small>512 token 문서, 5-gram 해시 × 30 레이어</small></td>
               <td class="unit">token/s</td>
-              <td class="r num">—</td>
+              <td class="r num" id="res-b1">—</td>
               <td class="r num muted">—</td>
               <td class="r num muted">—</td>
-              <td class="r"><button class="btn-sm" type="button" disabled>실행</button></td>
+              <td class="r"><button class="btn-sm" type="button" data-bench="b1">실행</button></td>
             </tr>
             <tr>
-              <td><b>B2</b> 구간 탐지 (GCD·AOL)<small>3,000 token 점수열</small></td>
+              <td><b>B2</b> 구간 탐지 (GCD·AOL)<small>3,000 token 점수열, 다중 스케일 + CUSUM</small></td>
               <td class="unit">doc/s</td>
-              <td class="r num">—</td>
+              <td class="r num" id="res-b2">—</td>
               <td class="r num muted">—</td>
               <td class="r num muted">—</td>
-              <td class="r"><button class="btn-sm" type="button" disabled>실행</button></td>
+              <td class="r"><button class="btn-sm" type="button" data-bench="b2">실행</button></td>
             </tr>
             <tr>
-              <td><b>B4</b> 임베딩 추론<small>소형 문장 임베딩, WebGPU</small></td>
+              <td><b>B4</b> 임베딩 추론<small>소형 문장 임베딩, WebGPU · 준비 중</small></td>
               <td class="unit">sent/s</td>
               <td class="r num">—</td>
               <td class="r num muted">—</td>
@@ -97,7 +107,10 @@
 
       <!-- 작업 기록 -->
       <section class="section" aria-labelledby="h-log">
-        <h2 id="h-log">작업 기록</h2>
+        <div class="section-head">
+          <h2 id="h-log">작업 기록</h2>
+          <button class="link-btn" type="button" id="clearLog">기록 지우기</button>
+        </div>
         <ol class="log" id="log">
           <li><time>--:--:--</time>아직 기록이 없습니다.</li>
         </ol>
